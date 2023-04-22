@@ -3,11 +3,10 @@ package com.lizhi.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lizhi.common.BaseResponse;
-import com.lizhi.model.domain.User;
-
 import com.lizhi.common.ErrorCode;
 import com.lizhi.common.ResultUtils;
 import com.lizhi.exception.BusinessException;
+import com.lizhi.model.domain.User;
 import com.lizhi.model.request.UserLoginRequest;
 import com.lizhi.model.request.UserRegisterRequest;
 import com.lizhi.service.UserService;
@@ -33,7 +32,7 @@ import static com.lizhi.constant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:3000"},allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000"})
 @Slf4j
 public class UserController {
 
@@ -60,7 +59,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<?> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
@@ -113,6 +112,7 @@ public class UserController {
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
+
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         List<User> userList = userService.searchUsersByTags(tagNameList);
@@ -125,10 +125,11 @@ public class UserController {
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
-        String redisKey = String.format("yupao:user:recommend:%s", loginUser.getId());
+        String redisKey = String.format("find-friend:user:recommend:%s", loginUser.getId());
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         // 如果有缓存，直接读缓存
         Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+
         if (userPage != null) {
             return ResultUtils.success(userPage);
         }
@@ -170,14 +171,13 @@ public class UserController {
 
     /**
      * 获取最匹配的用户
-     *
-     * @param num
-     * @param request
-     * @return
      */
     @GetMapping("/match")
     public BaseResponse<List<User>> matchUsers(long num, HttpServletRequest request) {
-        if (num <= 0 || num > 20) {
+        final int numStart=0;
+        final int numEnd=20;
+
+        if (num <= numStart || num > numEnd) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.getLoginUser(request);

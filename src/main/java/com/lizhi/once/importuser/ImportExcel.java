@@ -17,7 +17,7 @@ public class ImportExcel {
     public static void main(String[] args) {
         // 写法1：JDK8+
         // since: 3.0.0-beta1
-        String fileName = "E:\\星球项目\\yupao-backend\\src\\main\\resources\\testExcel.xlsx";
+        String fileName = "E:\\yupi-project\\find-friend-backend\\src\\main\\resources\\testExcel.xlsx";
 //        readByListener(fileName);
         synchronousRead(fileName);
     }

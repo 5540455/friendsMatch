@@ -9,15 +9,17 @@ import java.util.stream.Collectors;
 
 /**
  * 导入星球用户到数据库
+ * @author 荔枝
  */
 public class ImportXingQiuUser {
 
     public static void main(String[] args) {
-        String fileName = "E:\\星球项目\\yupao-backend\\src\\main\\resources\\prodExcel.xlsx";
+        String fileName = "E:\\yupi-project\\find-friend-backend\\src\\main\\resources\\prodExcel.xlsx";
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 同步读取会自动finish
         List<XingQiuTableUserInfo> userInfoList =
                 EasyExcel.read(fileName).head(XingQiuTableUserInfo.class).sheet().doReadSync();
         System.out.println("总数 = " + userInfoList.size());
+
         Map<String, List<XingQiuTableUserInfo>> listMap =
                 userInfoList.stream()
                         .filter(userInfo -> StringUtils.isNotEmpty(userInfo.getUsername()))

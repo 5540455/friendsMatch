@@ -23,5 +23,9 @@ public interface UserConstant {
      * 管理员权限
      */
     int ADMIN_ROLE = 1;
+    /**
+     * 用户账号长度
+     */
+
 
 }

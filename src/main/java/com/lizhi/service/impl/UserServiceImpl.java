@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lizhi.common.ErrorCode;
 import com.lizhi.constant.UserConstant;
 import com.lizhi.exception.BusinessException;
+import com.lizhi.mapper.UserMapper;
 import com.lizhi.model.domain.User;
 import com.lizhi.service.UserService;
-import com.lizhi.common.ErrorCode;
-import com.lizhi.mapper.UserMapper;
 import com.lizhi.utils.AlgorithmUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "星球编号过长");
         }
         // 账户不能包含特殊字符
-        String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\\\\\.<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {
             return -1;
@@ -214,6 +214,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!isAdmin(loginUser) && userId != loginUser.getId()) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
+        // 查询表中有无此数据
         User oldUser = userMapper.selectById(userId);
         if (oldUser == null) {
             throw new BusinessException(ErrorCode.NULL_ERROR);

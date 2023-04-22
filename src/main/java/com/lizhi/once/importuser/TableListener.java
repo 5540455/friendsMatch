@@ -4,6 +4,9 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author 荔枝
+ */
 @Slf4j
 public class TableListener implements ReadListener<XingQiuTableUserInfo> {
 

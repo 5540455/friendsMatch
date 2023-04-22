@@ -41,7 +41,7 @@ public class PreCacheJob {
     // 每天执行，预热推荐用户
     @Scheduled(cron = "0 31 0 * * *")
     public void doCacheRecommendUser() {
-        RLock lock = redissonClient.getLock("yupao:precachejob:docache:lock");
+        RLock lock = redissonClient.getLock("find-friend:precachejob:docache:lock");
         try {
             // 只有一个线程能获取到锁
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
@@ -49,7 +49,7 @@ public class PreCacheJob {
                 for (Long userId : mainUserList) {
                     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
                     Page<User> userPage = userService.page(new Page<>(1, 20), queryWrapper);
-                    String redisKey = String.format("yupao:user:recommend:%s", userId);
+                    String redisKey = String.format("find-friend:user:recommend:%s", userId);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     // 写缓存
                     try {

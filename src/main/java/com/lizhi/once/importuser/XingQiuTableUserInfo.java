@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 星球表格用户信息
+ * @author 荔枝
  */
 @Data
 public class XingQiuTableUserInfo {

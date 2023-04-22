@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author  荔枝
+ @EnableScheduling 开启任务调度
  */
 @SpringBootApplication
 @MapperScan("com.lizhi.mapper")

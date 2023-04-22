@@ -51,7 +51,7 @@ public class RedissonTest {
 
     @Test
     void testWatchDog() {
-        RLock lock = redissonClient.getLock("yupao:precachejob:docache:lock");
+        RLock lock = redissonClient.getLock("find-friend:precachejob:docache:lock");
         try {
             // 只有一个线程能获取到锁
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {

@@ -7,6 +7,9 @@ package com.lizhi.common;
  */
 public enum ErrorCode {
 
+    /**
+     * 错误码枚举
+     */
     SUCCESS(0, "ok", ""),
     PARAMS_ERROR(40000, "请求参数错误", ""),
     NULL_ERROR(40001, "请求数据为空", ""),
