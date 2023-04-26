@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @MapperScan("com.lizhi.mapper")
 @EnableScheduling
-public class MyApplication {
+public class FindFriendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MyApplication.class, args);
+        SpringApplication.run(FindFriendApplication.class, args);
     }
 
 }

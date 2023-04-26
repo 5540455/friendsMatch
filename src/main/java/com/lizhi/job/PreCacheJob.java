@@ -1,6 +1,7 @@
 package com.lizhi.job;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lizhi.model.domain.User;
 import com.lizhi.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,10 +37,12 @@ public class PreCacheJob {
     @Resource
     private RedissonClient redissonClient;
 
-    // 重点用户
-    private List<Long> mainUserList = Arrays.asList(1L);
 
-    // 每天执行，预热推荐用户
+    private List<Long> mainUserList=new ArrayList<>();
+
+    /**
+     *    每天执行，预热推荐用户
+     */
     @Scheduled(cron = "0 31 0 * * *")
     public void doCacheRecommendUser() {
         RLock lock = redissonClient.getLock("find-friend:precachejob:docache:lock");
@@ -46,14 +50,22 @@ public class PreCacheJob {
             // 只有一个线程能获取到锁
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 System.out.println("getLock: " + Thread.currentThread().getId());
+                LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+                Wrapper<User> gt = queryWrapper.gt(User::getUserRole, 0);
+                List<User> userList = userService.getBaseMapper().selectList(gt);
+                for(User user:userList){
+                    mainUserList.add(user.getId());
+                }
                 for (Long userId : mainUserList) {
-                    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-                    Page<User> userPage = userService.page(new Page<>(1, 20), queryWrapper);
+                    LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+                    //不推荐自己
+                    wrapper.ne(User::getId,userId);
+                    Page<User> userPage = userService.page(new Page<>(1, 20),wrapper);
                     String redisKey = String.format("find-friend:user:recommend:%s", userId);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     // 写缓存
                     try {
-                        valueOperations.set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
+                        valueOperations.set(redisKey, userPage, 1, TimeUnit.MINUTES);
                     } catch (Exception e) {
                         log.error("redis set key error", e);
                     }

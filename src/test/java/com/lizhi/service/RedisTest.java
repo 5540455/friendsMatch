@@ -1,6 +1,7 @@
 package com.lizhi.service;
 
 import com.lizhi.model.domain.User;
+import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +14,7 @@ import javax.annotation.Resource;
 public class RedisTest {
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Test
     void test() {

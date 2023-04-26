@@ -27,5 +27,6 @@ public interface UserConstant {
      * 用户账号长度
      */
 
+    String FIND_FRIEND = "find-friend";
 
 }

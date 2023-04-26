@@ -10,12 +10,15 @@ import com.lizhi.model.domain.User;
 import com.lizhi.model.request.UserLoginRequest;
 import com.lizhi.model.request.UserRegisterRequest;
 import com.lizhi.service.UserService;
+import io.swagger.annotations.ApiOperation;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import reactor.util.annotation.Nullable;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -123,9 +126,11 @@ public class UserController {
      todo 推荐多个，未实现
      */
     @GetMapping("/recommend")
-    public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+    @ApiOperation("返回推荐列表")
+    public BaseResponse<Page<User>> recommendUsers(@NonNull long pageSize,@NonNull long pageNum, @NonNull HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         String redisKey = String.format("find-friend:user:recommend:%s", loginUser.getId());
+
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         // 如果有缓存，直接读缓存
         Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
@@ -134,13 +139,18 @@ public class UserController {
             return ResultUtils.success(userPage);
         }
         // 无缓存，查数据库
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        userPage = userService.page(new Page<>(pageNum, pageSize));
         // 写缓存
         try {
+            //redis 内存不能无限增加、必须设置淘汰时间 30秒
             valueOperations.set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             log.error("redis set key error", e);
+        }finally {
+            //关闭线程
+            if(redisTemplate!=null){
+                redisTemplate.getConnectionFactory().getConnection().close();
+            }
         }
         return ResultUtils.success(userPage);
     }

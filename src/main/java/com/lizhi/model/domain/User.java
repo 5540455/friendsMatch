@@ -1,17 +1,22 @@
 package com.lizhi.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 用户
+ * @author 荔枝
  * @TableName user
  */
 @TableName(value ="user")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
     /**
      * id

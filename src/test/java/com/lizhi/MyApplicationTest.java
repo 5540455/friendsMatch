@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.DigestUtils;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 @SpringBootTest
@@ -20,4 +21,9 @@ class MyApplicationTest {
 
     }
 
+
+    @Test
+    void test() throws IOException, InterruptedException {
+
+    }
 }
